@@ -1,0 +1,4 @@
+GrpcPort: 8080
+HttpPort: 8090
+
+LogLevel: DEBUG

@@ -1,0 +1,7 @@
+POST {{host}}:{{port}}/demo
+Content-Type: application/json
+
+{
+  "age": 18,
+  "name": "scguo"
+}

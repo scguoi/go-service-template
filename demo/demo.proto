@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package example;
+
+option go_package="template/demo";
+
+import "google/api/annotations.proto";
+
+/**
+ * 响应包
+ */
+message ReqPkg {
+  string name = 1; /// 用户名
+  int32 age = 2; /// 名字
+}
+
+/**
+ * 响应包
+ */
+message RespPkg {
+  int32 code = 1; /// 响应码
+  string msg = 2; /// 响应消息
+}
+
+// Demo 服务
+service DemoService {
+  rpc OneWay (ReqPkg) returns (RespPkg){
+    option (google.api.http) = {
+      post: "/demo"
+      body: "*"
+    };
+  }
+}
