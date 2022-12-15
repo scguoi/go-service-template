@@ -16,6 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 
 	_ "template/config"
 	_ "template/logc"
@@ -28,10 +29,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
-	s := grpc.NewServer()
-	demoProto.RegisterDemoServiceServer(s, impl.NewDemoService())
+	grpcServer := grpc.NewServer()
+	reflection.Register(grpcServer)
+	demoProto.RegisterDemoServiceServer(grpcServer, impl.NewDemoService())
 	log.Println("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
-	go func() { log.Fatalln(s.Serve(lis)) }()
+	go func() { log.Fatalln(grpcServer.Serve(lis)) }()
 
 	// grpc gateway
 	conn, err := grpc.DialContext(
@@ -72,7 +74,7 @@ func main() {
 		} else {
 			log.Println("gwServer shutdown succeed")
 		}
-		s.GracefulStop()
+		grpcServer.GracefulStop()
 		log.Println("grpc server graceful stop")
 		err = apiSrv.Shutdown(ctx)
 		if err != nil {
