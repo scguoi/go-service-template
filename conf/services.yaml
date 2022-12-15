@@ -2,3 +2,4 @@ GrpcPort: 8080
 HttpPort: 8090
 
 LogLevel: DEBUG
+LogFile: ./logs/demo.log

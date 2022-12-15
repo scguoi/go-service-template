@@ -13,6 +13,7 @@ type ServiceYaml struct {
 	GRPCPort int    `yaml:"GrpcPort"`
 	HTTPPort int    `yaml:"HttpPort"`
 	LogLevel string `yaml:"LogLevel"`
+	LogFile  string `yaml:"LogFile"`
 }
 
 var ServiceConfig *ServiceYaml

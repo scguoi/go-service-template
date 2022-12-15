@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"strings"
 	"template/config"
+	"time"
 
+	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -37,4 +39,11 @@ func init() {
 			return frame.Function, path.Base(frame.File) + ":" + strconv.Itoa(frame.Line)
 		},
 	})
+	writer, _ := rotateLogs.New(
+		config.ServiceConfig.LogFile+".%Y%m%d",
+		rotateLogs.WithLinkName(config.ServiceConfig.LogFile),
+		rotateLogs.WithMaxAge(time.Duration(30*24)*time.Hour),
+		rotateLogs.WithRotationTime(time.Duration(1*24)*time.Hour),
+	)
+	log.SetOutput(writer)
 }
