@@ -1,5 +1,5 @@
 # go-service-template
-go 服务模板 支持grpc和http请求，使用logrus配置日志，使用grpc和grpc-gateway暴露服务。
+go 服务模板工程 支持grpc和http请求，使用logrus配置日志，使用grpc和grpc-gateway暴露服务。
 
 使用yaml配置文件配置服务。
 
