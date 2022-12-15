@@ -3,6 +3,10 @@ go 服务模板 支持grpc和http请求，使用logrus配置日志，使用grpc�
 
 使用yaml配置文件配置服务。
 
+可以使用浏览器查看接口文档。
+
+http://localhost:8070/api/docs
+
 ## gen.sh
 用于生成grpc grpc-gateway的代码，本地需要安装protoc protoc-gen-go protoc-gen-grpc-gateway
 
