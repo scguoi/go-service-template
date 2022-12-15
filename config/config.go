@@ -16,6 +16,7 @@ type ServiceYaml struct {
 	LogOut     string `yaml:"LogOut"`
 	LogFile    string `yaml:"LogFile"`
 	LogMaxDays int    `yaml:"LogMaxDays"`
+	APIPort    int    `yaml:"APIPort"`
 }
 
 var ServiceConfig *ServiceYaml

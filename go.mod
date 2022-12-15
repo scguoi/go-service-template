@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.14.0
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/sirupsen/logrus v1.9.0
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37

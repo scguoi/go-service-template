@@ -11,6 +11,7 @@ import (
 	demoProto "template/demo"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -28,9 +29,7 @@ func main() {
 	s := grpc.NewServer()
 	demoProto.RegisterDemoServiceServer(s, impl.NewDemoService())
 	log.Println("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
-	go func() {
-		log.Fatalln(s.Serve(lis))
-	}()
+	go func() { log.Fatalln(s.Serve(lis)) }()
 
 	conn, err := grpc.DialContext(
 		context.Background(),
@@ -48,5 +47,11 @@ func main() {
 		Handler: gwMux,
 	}
 	log.Println("Serving gRPC-Gateway on", fmt.Sprintf(":%d", config.ServiceConfig.HTTPPort))
-	log.Fatalln(gwServer.ListenAndServe())
+	go func() { log.Fatalln(gwServer.ListenAndServe()) }()
+
+	router := httprouter.New()
+	router.GET("/api/docs", demoProto.APIProto)
+	bind := fmt.Sprintf(":%d", config.ServiceConfig.APIPort)
+	log.Println("Serving API Proto starting on", bind)
+	log.Fatalln(http.ListenAndServe(bind, router))
 }
