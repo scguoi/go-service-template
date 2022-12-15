@@ -20,6 +20,7 @@ import (
 )
 
 func main() {
+	log.Debugln("hi service is starting...")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
