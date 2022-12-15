@@ -39,11 +39,13 @@ func init() {
 			return frame.Function, path.Base(frame.File) + ":" + strconv.Itoa(frame.Line)
 		},
 	})
-	writer, _ := rotateLogs.New(
-		config.ServiceConfig.LogFile+".%Y%m%d",
-		rotateLogs.WithLinkName(config.ServiceConfig.LogFile),
-		rotateLogs.WithMaxAge(time.Duration(30*24)*time.Hour),
-		rotateLogs.WithRotationTime(time.Duration(1*24)*time.Hour),
-	)
-	log.SetOutput(writer)
+	if strings.ToLower(config.ServiceConfig.LogOut) == "file" {
+		writer, _ := rotateLogs.New(
+			config.ServiceConfig.LogFile+".%Y%m%d",
+			rotateLogs.WithLinkName(config.ServiceConfig.LogFile),
+			rotateLogs.WithMaxAge(time.Duration(config.ServiceConfig.LogMaxDays*24)*time.Hour),
+			rotateLogs.WithRotationTime(time.Duration(1*24)*time.Hour),
+		)
+		log.SetOutput(writer)
+	}
 }

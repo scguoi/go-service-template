@@ -2,4 +2,6 @@ GrpcPort: 8080
 HttpPort: 8090
 
 LogLevel: DEBUG
+LogOut: console
 LogFile: ./logs/demo.log
+LogMaxDays: 30
