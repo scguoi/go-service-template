@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"template/config"
 	"template/impl"
+	"template/osutils"
 
 	demoProto "template/demo"
 
@@ -21,6 +22,7 @@ import (
 )
 
 func main() {
+	// grpc server
 	log.Debugln("hi service is starting...")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	if err != nil {
@@ -31,6 +33,7 @@ func main() {
 	log.Println("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	go func() { log.Fatalln(s.Serve(lis)) }()
 
+	// grpc gateway
 	conn, err := grpc.DialContext(
 		context.Background(),
 		"0.0.0.0:8080",
@@ -49,9 +52,33 @@ func main() {
 	log.Println("Serving gRPC-Gateway on", fmt.Sprintf(":%d", config.ServiceConfig.HTTPPort))
 	go func() { log.Fatalln(gwServer.ListenAndServe()) }()
 
+	// api docs
 	router := httprouter.New()
 	router.GET("/api/docs", demoProto.APIProto)
 	bind := fmt.Sprintf(":%d", config.ServiceConfig.APIPort)
 	log.Println("Serving API Proto starting on", bind)
-	log.Fatalln(http.ListenAndServe(bind, router))
+	apiSrv := &http.Server{
+		Addr:    bind,
+		Handler: router,
+	}
+	go func() { log.Fatalln(apiSrv.ListenAndServe()) }()
+
+	// graceful stop
+	signalChan := osutils.NewShutdownSignal()
+	osutils.WaitExit(signalChan, func(ctx context.Context) {
+		err := gwServer.Shutdown(ctx)
+		if err != nil {
+			log.Println("gwServer shutdown failed", err)
+		} else {
+			log.Println("gwServer shutdown succeed")
+		}
+		s.GracefulStop()
+		log.Println("grpc server graceful stop")
+		err = apiSrv.Shutdown(ctx)
+		if err != nil {
+			log.Println("apiSrv shutdown failed", err)
+		} else {
+			log.Println("apiSrv shutdown succeed")
+		}
+	})
 }

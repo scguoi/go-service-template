@@ -7,6 +7,8 @@ go 服务模板 支持grpc和http请求，使用logrus配置日志，使用grpc�
 
 http://localhost:8070/api/docs
 
+支持退出信号的捕获和优雅退出。
+
 ## gen.sh
 用于生成grpc grpc-gateway的代码，本地需要安装protoc protoc-gen-go protoc-gen-grpc-gateway
 

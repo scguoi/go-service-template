@@ -17,13 +17,14 @@ func NewDemoService() *DemoService {
 }
 
 func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *demoProto.RespPkg, err error) {
-	res, err = &demoProto.RespPkg{Code: req.Age, Msg: "hello " + req.Name}, nil
+	CurrentReqCount.Inc()
 	defer func() {
+		CurrentReqCount.Dec()
 		if err := recover(); err != nil {
 			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}
 	}()
-
+	res, err = &demoProto.RespPkg{Code: req.Age, Msg: "hello " + req.Name}, nil
 	log.WithField("req", req).Info("OneWay")
-	panic("panic")
+	panic("panic testing")
 }
