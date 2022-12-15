@@ -26,6 +26,8 @@ func init() {
 		log.SetLevel(log.PanicLevel)
 	case "trace":
 		log.SetLevel(log.TraceLevel)
+	default:
+		log.SetLevel(log.InfoLevel)
 	}
 	log.SetReportCaller(true)
 	log.SetFormatter(&log.JSONFormatter{
