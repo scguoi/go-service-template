@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/http/pprof"
 	"template/config"
 	"template/impl"
 	"template/osutils"
@@ -20,6 +21,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
+	_ "net/http/pprof"
 	_ "template/config"
 	_ "template/logc"
 )
@@ -74,7 +76,14 @@ func main() {
 	// prometheus
 	go func() {
 		log.Println("Serving Prometheus on", fmt.Sprintf(":%d", config.ServiceConfig.MetricPort))
-		_ = http.ListenAndServe(fmt.Sprintf(":%d", config.ServiceConfig.MetricPort), promhttp.Handler())
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
+		mux.HandleFunc("/debug/pprof/", pprof.Index)
+		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+		mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+		mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+		_ = http.ListenAndServe(fmt.Sprintf(":%d", config.ServiceConfig.MetricPort), mux)
 	}()
 	// graceful stop
 	signalChan := osutils.NewShutdownSignal()
