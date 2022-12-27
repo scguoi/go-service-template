@@ -73,6 +73,7 @@ func main() {
 
 	// prometheus
 	go func() {
+		log.Println("Serving Prometheus on", fmt.Sprintf(":%d", config.ServiceConfig.MetricPort))
 		_ = http.ListenAndServe(fmt.Sprintf(":%d", config.ServiceConfig.MetricPort), promhttp.Handler())
 	}()
 	// graceful stop
