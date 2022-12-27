@@ -25,6 +25,5 @@ func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *d
 		}
 	}()
 	res, err = &demoProto.RespPkg{Code: req.Age, Msg: "hello " + req.Name}, nil
-	log.WithField("req", req).Info("OneWay")
-	panic("panic testing")
+	return
 }
