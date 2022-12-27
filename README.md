@@ -28,3 +28,8 @@ grpcurl -plaintext -d '{"age":18,"name":"scguo"}' 127.0.0.1:8080 example.DemoSer
 
 curl -X POST -d '{"age":18,"name":"scguo"}' http://127.0.0.1:8090/demo
 ```
+
+## todo
+
+1. 使用日志context把一次请求的所有日志都打印到一起
+2. 使用prometheus监控服务
