@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"template/config"
+	"template/gracefulstop"
 	"template/impl"
-	"template/osutils"
 
 	demoProto "template/demo"
 
@@ -86,8 +86,8 @@ func main() {
 		_ = http.ListenAndServe(fmt.Sprintf(":%d", config.ServiceConfig.MetricPort), mux)
 	}()
 	// graceful stop
-	signalChan := osutils.NewShutdownSignal()
-	osutils.WaitExit(signalChan, func(ctx context.Context) {
+	signalChan := gracefulstop.NewShutdownSignal()
+	gracefulstop.WaitExit(signalChan, func(ctx context.Context) {
 		err := gwServer.Shutdown(ctx)
 		if err != nil {
 			log.Println("gwServer shutdown failed", err)
