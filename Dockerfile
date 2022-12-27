@@ -11,5 +11,6 @@ COPY --from=builder /DEMO/apiproto /DEMO/apiproto
 EXPOSE 8080
 EXPOSE 8090
 EXPOSE 8070
+EXPOSE 8060
 WORKDIR /DEMO
 CMD ["./demo_service"]

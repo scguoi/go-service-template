@@ -17,6 +17,7 @@ type ServiceYaml struct {
 	LogFile    string `yaml:"LogFile"`
 	LogMaxDays int    `yaml:"LogMaxDays"`
 	APIPort    int    `yaml:"APIPort"`
+	MetricPort int    `yaml:"MetricPort"`
 }
 
 var ServiceConfig *ServiceYaml

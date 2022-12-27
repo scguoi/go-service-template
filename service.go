@@ -11,8 +11,10 @@ import (
 
 	demoProto "template/demo"
 
+	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/julienschmidt/httprouter"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -29,9 +31,13 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.StreamInterceptor(grpcPrometheus.StreamServerInterceptor),
+		grpc.UnaryInterceptor(grpcPrometheus.UnaryServerInterceptor),
+	)
 	reflection.Register(grpcServer)
 	demoProto.RegisterDemoServiceServer(grpcServer, impl.NewDemoService())
+	grpcPrometheus.Register(grpcServer)
 	log.Println("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	go func() { log.Fatalln(grpcServer.Serve(lis)) }()
 
@@ -65,6 +71,10 @@ func main() {
 	}
 	go func() { log.Fatalln(apiSrv.ListenAndServe()) }()
 
+	// prometheus
+	go func() {
+		_ = http.ListenAndServe(fmt.Sprintf(":%d", config.ServiceConfig.MetricPort), promhttp.Handler())
+	}()
 	// graceful stop
 	signalChan := osutils.NewShutdownSignal()
 	osutils.WaitExit(signalChan, func(ctx context.Context) {

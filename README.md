@@ -9,6 +9,10 @@ http://localhost:8070/api/docs
 
 支持退出信号的捕获和优雅退出。
 
+自动集成了prometheus暴露基础指标
+
+http://localhost:8060/metrics
+
 ## gen.sh
 用于生成grpc grpc-gateway的代码，本地需要安装protoc protoc-gen-go protoc-gen-grpc-gateway
 
@@ -32,4 +36,3 @@ curl -X POST -d '{"age":18,"name":"scguo"}' http://127.0.0.1:8090/demo
 ## todo
 
 1. 使用日志context把一次请求的所有日志都打印到一起
-2. 使用prometheus监控服务

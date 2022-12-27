@@ -5,4 +5,4 @@ protoc -I=demo --doc_out=demo --doc_opt=html,index.html --go_out=apiproto --go_o
 docker build -t scguo/mydemo:latest .
 
 # run
-docker run -p 8080:8080 -p 8090:8090 -p 8070:8070 -d scguo/mydemo:latest
+docker run -p 8080:8080 -p 8090:8090 -p 8070:8070 -p 8060:8060 -d scguo/mydemo:latest
