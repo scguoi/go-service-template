@@ -3,10 +3,12 @@ module template
 go 1.19
 
 require (
+	github.com/google/gops v0.3.26
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.14.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/prometheus/client_golang v1.14.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/uber-go/atomic v1.4.0
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37
@@ -24,7 +26,6 @@ require (
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prometheus/client_golang v1.14.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect

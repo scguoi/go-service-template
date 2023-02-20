@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/google/gops/agent"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -85,6 +86,16 @@ func main() {
 		mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 		_ = http.ListenAndServe(fmt.Sprintf(":%d", config.ServiceConfig.MetricPort), mux)
 	}()
+
+	// gOps
+	agentOptions := agent.Options{
+		ShutdownCleanup: true,
+		Addr:            fmt.Sprintf(":%d", config.ServiceConfig.AgentOpsPort),
+	}
+	if err := agent.Listen(agentOptions); err != nil {
+		log.Fatalln(err)
+	}
+
 	// graceful stop
 	signalChan := gracefulstop.NewShutdownSignal()
 	gracefulstop.WaitExit(signalChan, func(ctx context.Context) {

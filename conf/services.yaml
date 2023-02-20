@@ -2,6 +2,7 @@ GrpcPort: 8080
 HttpPort: 8090
 APIPort: 8070
 MetricPort: 8060
+AgentOpsPort: 8050
 
 LogLevel: DEBUG
 LogOut: console

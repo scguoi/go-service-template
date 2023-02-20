@@ -10,14 +10,15 @@ import (
 const configFile = "conf/services.yaml"
 
 type ServiceYaml struct {
-	GRPCPort   int    `yaml:"GrpcPort"`
-	HTTPPort   int    `yaml:"HttpPort"`
-	LogLevel   string `yaml:"LogLevel"`
-	LogOut     string `yaml:"LogOut"`
-	LogFile    string `yaml:"LogFile"`
-	LogMaxDays int    `yaml:"LogMaxDays"`
-	APIPort    int    `yaml:"APIPort"`
-	MetricPort int    `yaml:"MetricPort"`
+	GRPCPort     int    `yaml:"GrpcPort"`
+	HTTPPort     int    `yaml:"HttpPort"`
+	LogLevel     string `yaml:"LogLevel"`
+	LogOut       string `yaml:"LogOut"`
+	LogFile      string `yaml:"LogFile"`
+	LogMaxDays   int    `yaml:"LogMaxDays"`
+	APIPort      int    `yaml:"APIPort"`
+	MetricPort   int    `yaml:"MetricPort"`
+	AgentOpsPort int    `yaml:"AgentOpsPort"`
 }
 
 var ServiceConfig *ServiceYaml

@@ -13,6 +13,10 @@ http://localhost:8070/api/docs
 
 http://localhost:8060/metrics
 
+支持gops来debug服务
+
+[gops使用](https://github.com/google/gops)
+
 ## gen.sh
 用于生成grpc grpc-gateway的代码，本地需要安装protoc protoc-gen-go protoc-gen-grpc-gateway
 
