@@ -288,7 +288,14 @@
                 <td>OneWay</td>
                 <td><a href="#example.ReqPkg">ReqPkg</a></td>
                 <td><a href="#example.RespPkg">RespPkg</a></td>
-                <td><p></p></td>
+                <td><p>单次调用的方法 支持http和grpc调用</p></td>
+              </tr>
+            
+              <tr>
+                <td>Stream</td>
+                <td><a href="#example.ReqPkg">ReqPkg</a> stream</td>
+                <td><a href="#example.RespPkg">RespPkg</a> stream</td>
+                <td><p>流式调用的方法 支持http trunk和grpc调用</p></td>
               </tr>
             
           </tbody>
@@ -315,6 +322,16 @@
                 <td>OneWay</td>
                 <td>POST</td>
                 <td>/demo</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>Stream</td>
+                <td>POST</td>
+                <td>/stream</td>
                 <td>*</td>
               </tr>
               

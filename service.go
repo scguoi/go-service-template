@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/gops/agent"
+	"google.golang.org/grpc/reflection"
 	"net"
 	"net/http"
 	"net/http/pprof"
-	"template/config"
-	"template/gracefulstop"
-	"template/impl"
+	"template/internal/config"
+	"template/internal/gracefulstop"
+	"template/internal/impl"
 
 	demoProto "template/demo"
 
@@ -20,16 +21,14 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-
 	_ "net/http/pprof"
-	_ "template/config"
-	_ "template/logc"
+	_ "template/internal/config"
+	_ "template/internal/logc"
 )
 
 func main() {
 	// grpc server
-	log.Debugln("hi service is starting...")
+	log.Println("hi service is starting...")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -38,9 +37,9 @@ func main() {
 		grpc.StreamInterceptor(grpcPrometheus.StreamServerInterceptor),
 		grpc.UnaryInterceptor(grpcPrometheus.UnaryServerInterceptor),
 	)
-	reflection.Register(grpcServer)
 	demoProto.RegisterDemoServiceServer(grpcServer, impl.NewDemoService())
 	grpcPrometheus.Register(grpcServer)
+	reflection.Register(grpcServer)
 	log.Println("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	go func() { log.Fatalln(grpcServer.Serve(lis)) }()
 
@@ -113,5 +112,6 @@ func main() {
 		} else {
 			log.Println("apiSrv shutdown succeed")
 		}
+		agent.Close()
 	})
 }

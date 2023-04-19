@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"template/config"
+	"template/internal/config"
 	"time"
 
 	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
@@ -33,7 +33,7 @@ func init() {
 	}
 	log.SetReportCaller(true)
 	log.SetFormatter(&log.JSONFormatter{
-		TimestampFormat: "2006-01-02 15:03:04",
+		TimestampFormat: "2006-01-02 15:05:04",
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
 			//处理文件名
 			return frame.Function, path.Base(frame.File) + ":" + strconv.Itoa(frame.Line)

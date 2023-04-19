@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"template/impl"
+	"template/internal/impl"
 	"time"
 
 	log "github.com/sirupsen/logrus"

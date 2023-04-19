@@ -24,9 +24,17 @@ message RespPkg {
 
 // Demo 服务
 service DemoService {
+  // 单次调用的方法 支持http和grpc调用
   rpc OneWay (ReqPkg) returns (RespPkg){
     option (google.api.http) = {
       post: "/demo"
+      body: "*"
+    };
+  }
+  // 流式调用的方法 支持http trunk和grpc调用
+  rpc Stream (stream ReqPkg) returns (stream RespPkg){
+    option (google.api.http) = {
+      post: "/stream"
       body: "*"
     };
   }
