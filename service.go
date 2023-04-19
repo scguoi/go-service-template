@@ -19,6 +19,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"github.com/tmc/grpc-websocket-proxy/wsproxy"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	_ "net/http/pprof"
@@ -62,6 +63,14 @@ func main() {
 	log.Println("Serving gRPC-Gateway on", fmt.Sprintf(":%d", config.ServiceConfig.HTTPPort))
 	go func() { log.Fatalln(gwServer.ListenAndServe()) }()
 
+	// grpc websocket
+	gwWSServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", config.ServiceConfig.WSPort),
+		Handler: wsproxy.WebsocketProxy(gwMux),
+	}
+	log.Println("Serving gRPC-Websocket on", fmt.Sprintf(":%d", config.ServiceConfig.WSPort))
+	go func() { log.Fatalln(gwWSServer.ListenAndServe()) }()
+
 	// api docs
 	router := httprouter.New()
 	router.GET("/api/docs", demoProto.APIProto)
@@ -103,6 +112,12 @@ func main() {
 			log.Println("gwServer shutdown failed", err)
 		} else {
 			log.Println("gwServer shutdown succeed")
+		}
+		err = gwWSServer.Shutdown(ctx)
+		if err != nil {
+			log.Println("gwWSServer shutdown failed", err)
+		} else {
+			log.Println("gwWSServer shutdown succeed")
 		}
 		grpcServer.GracefulStop()
 		log.Println("grpc server graceful stop")

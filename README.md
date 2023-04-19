@@ -7,6 +7,7 @@
 * 你希望你的接口文档可以跟着服务走么, 直接通过服务暴露的端口在浏览器查看么
 * 你希望定义的接口可以同时被内部通过rpc调用, 也可以被外部通过http+json调用么
 * 你希望定义的流式接口可以同时被内部通过rpc调用, 也可以被外部通过http-trunk+json调用么
+* 你希望定义的接口可以直接被websocket调用么
 * 你希望你的接口可以暴露出一些默认指标给Prometheus监控么
 * 你希望你的服务可以自带Profile接口, 可以通过Go Profile工具来分析你的服务么
 * 你希望你的服务自带Gops, 可以通过Gops工具来分析你的服务么
@@ -109,6 +110,12 @@ curl -X POST -d '{"name":"scguo","age":1}{"name":"scguo","age":18}' -H "Transfer
 ```shell
 grpcurl -plaintext -d '{"age":18,"name":"scguo"}' 127.0.0.1:8080 example.DemoService/OneWay
 grpcurl -plaintext -d @ 127.0.0.1:8080  example.DemoService.Stream < grpc_stream.dat
+```
+
+### websocket
+
+```shell
+websocat "ws://127.0.0.1:8091/stream?method=POST" -H='Origin: ws://127.0.0.1:8091/stream?method=POST' -v
 ```
 
 ## todo

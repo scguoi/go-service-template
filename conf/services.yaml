@@ -1,5 +1,6 @@
 GrpcPort: 8080
 HttpPort: 8090
+WSPort: 8091
 APIPort: 8070
 MetricPort: 8060
 AgentOpsPort: 8050

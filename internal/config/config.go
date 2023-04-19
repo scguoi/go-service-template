@@ -12,6 +12,7 @@ const configFile = "conf/services.yaml"
 type ServiceYaml struct {
 	GRPCPort     int    `yaml:"GrpcPort"`
 	HTTPPort     int    `yaml:"HttpPort"`
+	WSPort       int    `yaml:"WSPort"`
 	LogLevel     string `yaml:"LogLevel"`
 	LogOut       string `yaml:"LogOut"`
 	LogFile      string `yaml:"LogFile"`
