@@ -23,6 +23,10 @@
 
 使用了 `grep-gateway` `protoc-gen-doc` `grpcurl` `gops` `protoc` 工具不了解的可以看下如何使用
 
+## 架构示意
+
+![架构示意](./docs/arch.png)
+
 ## 快速开始
 
 1. 在 `demo` 目录中定义你的接口, 例如 `demo.proto`
@@ -66,7 +70,7 @@ http://localhost:8070/api/docs
 
 当然这需要你的业务逻辑支持超时退出，你需要在处理函数中加入
     
-```go
+```
 CurrentReqCount.Inc()
 defer func() {
     CurrentReqCount.Dec()
