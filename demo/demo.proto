@@ -31,7 +31,7 @@ service DemoService {
       body: "*"
     };
   }
-  // 流式调用的方法 支持http trunk和grpc调用
+  // 流式调用的方法 支持http chunked和grpc调用
   rpc Stream (stream ReqPkg) returns (stream RespPkg){
     option (google.api.http) = {
       post: "/stream"

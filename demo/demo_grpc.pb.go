@@ -29,7 +29,7 @@ const (
 type DemoServiceClient interface {
 	// 单次调用的方法 支持http和grpc调用
 	OneWay(ctx context.Context, in *ReqPkg, opts ...grpc.CallOption) (*RespPkg, error)
-	// 流式调用的方法 支持http trunk和grpc调用
+	// 流式调用的方法 支持http chunked和grpc调用
 	Stream(ctx context.Context, opts ...grpc.CallOption) (DemoService_StreamClient, error)
 }
 
@@ -87,7 +87,7 @@ func (x *demoServiceStreamClient) Recv() (*RespPkg, error) {
 type DemoServiceServer interface {
 	// 单次调用的方法 支持http和grpc调用
 	OneWay(context.Context, *ReqPkg) (*RespPkg, error)
-	// 流式调用的方法 支持http trunk和grpc调用
+	// 流式调用的方法 支持http chunked和grpc调用
 	Stream(DemoService_StreamServer) error
 	mustEmbedUnimplementedDemoServiceServer()
 }
