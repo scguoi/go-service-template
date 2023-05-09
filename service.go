@@ -47,7 +47,7 @@ func main() {
 	// grpc gateway
 	conn, err := grpc.DialContext(
 		context.Background(),
-		"0.0.0.0:8080",
+		fmt.Sprintf("0.0.0.0:%d", config.ServiceConfig.GRPCPort),
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
