@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package example;
 
-option go_package="template/demo";
+option go_package = "template/demo";
 
 import "google/api/annotations.proto";
 
@@ -35,6 +35,13 @@ service DemoService {
   rpc Stream (stream ReqPkg) returns (stream RespPkg){
     option (google.api.http) = {
       post: "/stream"
+      body: "*"
+    };
+  }
+  // 流式调用的方法 支持http chunked和grpc调用
+  rpc HalfStream (ReqPkg) returns (stream RespPkg){
+    option (google.api.http) = {
+      post: "/halfstream"
       body: "*"
     };
   }

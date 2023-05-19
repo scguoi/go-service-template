@@ -114,6 +114,14 @@ curl -X POST -d '{"age":18,"name":"scguo"}' http://127.0.0.1:8090/demo
 curl -X POST -d '{"name":"scguo","age":1}{"name":"scguo","age":18}' -H "Transfer-Encoding: chunked" 127.0.0.1:8090/stream
 ```
 
+#### sse
+
+支持使用sse协议, 通过制定Accept方式为text/event-stream来调用服务
+
+```shell
+curl -X POST -d '{"name":"scguo","age":1}' -H "Accept:text/event-stream" 127.0.0.1:8090/halfstream -vvv
+```
+
 ### grpCurl
 ```shell
 grpcurl -plaintext -d '{"age":18,"name":"scguo"}' 127.0.0.1:8080 example.DemoService/OneWay

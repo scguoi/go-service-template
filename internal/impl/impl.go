@@ -29,6 +29,27 @@ func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *d
 	return
 }
 
+func (s *DemoService) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService_HalfStreamServer) error {
+	CurrentReqCount.Inc()
+	defer func() {
+		CurrentReqCount.Dec()
+		if err := recover(); err != nil {
+			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
+		}
+	}()
+	log.Println("half stream rev: ", req.Age, req.Name)
+	for {
+		if err := stream.Send(&demoProto.RespPkg{Code: 303, Msg: "continue"}); err != nil {
+			log.Println("stream send error:", err)
+		}
+		if err := stream.Send(&demoProto.RespPkg{Code: 200, Msg: "success"}); err != nil {
+			log.Println("stream send error:", err)
+		}
+		break
+	}
+	return nil
+}
+
 func (s *DemoService) Stream(stream demoProto.DemoService_StreamServer) error {
 	CurrentReqCount.Inc()
 	defer func() {

@@ -13,8 +13,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
+	"github.com/scguoi/grpc-gateway/v2/runtime"
+	"github.com/scguoi/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -108,6 +108,31 @@ func request_DemoService_Stream_0(ctx context.Context, marshaler runtime.Marshal
 	return stream, metadata, nil
 }
 
+func request_DemoService_HalfStream_0(ctx context.Context, marshaler runtime.Marshaler, client DemoServiceClient, req *http.Request, pathParams map[string]string) (DemoService_HalfStreamClient, runtime.ServerMetadata, error) {
+	var protoReq ReqPkg
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	stream, err := client.HalfStream(ctx, &protoReq)
+	if err != nil {
+		return nil, metadata, err
+	}
+	header, err := stream.Header()
+	if err != nil {
+		return nil, metadata, err
+	}
+	metadata.HeaderMD = header
+	return stream, metadata, nil
+
+}
+
 // RegisterDemoServiceHandlerServer registers the http handlers for service DemoService to "mux".
 // UnaryRPC     :call DemoServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -140,6 +165,13 @@ func RegisterDemoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 	})
 
 	mux.Handle("POST", pattern_DemoService_Stream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
+		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+		return
+	})
+
+	mux.Handle("POST", pattern_DemoService_HalfStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -231,6 +263,28 @@ func RegisterDemoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
+	mux.Handle("POST", pattern_DemoService_HalfStream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/example.DemoService/HalfStream", runtime.WithHTTPPathPattern("/halfstream"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DemoService_HalfStream_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_DemoService_HalfStream_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -238,10 +292,14 @@ var (
 	pattern_DemoService_OneWay_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"demo"}, ""))
 
 	pattern_DemoService_Stream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"stream"}, ""))
+
+	pattern_DemoService_HalfStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"halfstream"}, ""))
 )
 
 var (
 	forward_DemoService_OneWay_0 = runtime.ForwardResponseMessage
 
 	forward_DemoService_Stream_0 = runtime.ForwardResponseStream
+
+	forward_DemoService_HalfStream_0 = runtime.ForwardResponseStream
 )

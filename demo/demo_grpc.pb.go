@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	DemoService_OneWay_FullMethodName = "/example.DemoService/OneWay"
-	DemoService_Stream_FullMethodName = "/example.DemoService/Stream"
+	DemoService_OneWay_FullMethodName     = "/example.DemoService/OneWay"
+	DemoService_Stream_FullMethodName     = "/example.DemoService/Stream"
+	DemoService_HalfStream_FullMethodName = "/example.DemoService/HalfStream"
 )
 
 // DemoServiceClient is the client API for DemoService service.
@@ -31,6 +32,8 @@ type DemoServiceClient interface {
 	OneWay(ctx context.Context, in *ReqPkg, opts ...grpc.CallOption) (*RespPkg, error)
 	// 流式调用的方法 支持http chunked和grpc调用
 	Stream(ctx context.Context, opts ...grpc.CallOption) (DemoService_StreamClient, error)
+	// 流式调用的方法 支持http chunked和grpc调用
+	HalfStream(ctx context.Context, in *ReqPkg, opts ...grpc.CallOption) (DemoService_HalfStreamClient, error)
 }
 
 type demoServiceClient struct {
@@ -81,6 +84,38 @@ func (x *demoServiceStreamClient) Recv() (*RespPkg, error) {
 	return m, nil
 }
 
+func (c *demoServiceClient) HalfStream(ctx context.Context, in *ReqPkg, opts ...grpc.CallOption) (DemoService_HalfStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DemoService_ServiceDesc.Streams[1], DemoService_HalfStream_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &demoServiceHalfStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type DemoService_HalfStreamClient interface {
+	Recv() (*RespPkg, error)
+	grpc.ClientStream
+}
+
+type demoServiceHalfStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *demoServiceHalfStreamClient) Recv() (*RespPkg, error) {
+	m := new(RespPkg)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // DemoServiceServer is the server API for DemoService service.
 // All implementations must embed UnimplementedDemoServiceServer
 // for forward compatibility
@@ -89,6 +124,8 @@ type DemoServiceServer interface {
 	OneWay(context.Context, *ReqPkg) (*RespPkg, error)
 	// 流式调用的方法 支持http chunked和grpc调用
 	Stream(DemoService_StreamServer) error
+	// 流式调用的方法 支持http chunked和grpc调用
+	HalfStream(*ReqPkg, DemoService_HalfStreamServer) error
 	mustEmbedUnimplementedDemoServiceServer()
 }
 
@@ -101,6 +138,9 @@ func (UnimplementedDemoServiceServer) OneWay(context.Context, *ReqPkg) (*RespPkg
 }
 func (UnimplementedDemoServiceServer) Stream(DemoService_StreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method Stream not implemented")
+}
+func (UnimplementedDemoServiceServer) HalfStream(*ReqPkg, DemoService_HalfStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method HalfStream not implemented")
 }
 func (UnimplementedDemoServiceServer) mustEmbedUnimplementedDemoServiceServer() {}
 
@@ -159,6 +199,27 @@ func (x *demoServiceStreamServer) Recv() (*ReqPkg, error) {
 	return m, nil
 }
 
+func _DemoService_HalfStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ReqPkg)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DemoServiceServer).HalfStream(m, &demoServiceHalfStreamServer{stream})
+}
+
+type DemoService_HalfStreamServer interface {
+	Send(*RespPkg) error
+	grpc.ServerStream
+}
+
+type demoServiceHalfStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *demoServiceHalfStreamServer) Send(m *RespPkg) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // DemoService_ServiceDesc is the grpc.ServiceDesc for DemoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -177,6 +238,11 @@ var DemoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _DemoService_Stream_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "HalfStream",
+			Handler:       _DemoService_HalfStream_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "demo.proto",
