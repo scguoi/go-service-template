@@ -19,8 +19,10 @@ func NewDemoService() *DemoService {
 
 func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *demoProto.RespPkg, err error) {
 	CurrentReqCount.Inc()
+	startTime := time.Now()
 	defer func() {
 		CurrentReqCount.Dec()
+		ResponseTime.WithLabelValues("OneWay").Observe(time.Since(startTime).Seconds())
 		if err := recover(); err != nil {
 			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}
@@ -31,8 +33,10 @@ func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *d
 
 func (s *DemoService) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService_HalfStreamServer) error {
 	CurrentReqCount.Inc()
+	startTime := time.Now()
 	defer func() {
 		CurrentReqCount.Dec()
+		ResponseTime.WithLabelValues("HalfStream").Observe(time.Since(startTime).Seconds())
 		if err := recover(); err != nil {
 			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}
@@ -52,8 +56,10 @@ func (s *DemoService) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoSer
 
 func (s *DemoService) Stream(stream demoProto.DemoService_StreamServer) error {
 	CurrentReqCount.Inc()
+	startTime := time.Now()
 	defer func() {
 		CurrentReqCount.Dec()
+		ResponseTime.WithLabelValues("Stream").Observe(time.Since(startTime).Seconds())
 		if err := recover(); err != nil {
 			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}

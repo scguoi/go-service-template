@@ -24,6 +24,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	_ "net/http/pprof"
 	_ "template/internal/config"
+	_ "template/internal/impl"
 	_ "template/internal/logc"
 )
 
