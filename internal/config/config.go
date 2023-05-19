@@ -20,6 +20,9 @@ type ServiceYaml struct {
 	APIPort      int    `yaml:"APIPort"`
 	MetricPort   int    `yaml:"MetricPort"`
 	AgentOpsPort int    `yaml:"AgentOpsPort"`
+
+	CpName  string `yaml:"CpName"`
+	LogType string `yaml:"LogType"`
 }
 
 var ServiceConfig *ServiceYaml

@@ -5,6 +5,9 @@ APIPort: 8070
 MetricPort: 8060
 AgentOpsPort: 8050
 
+CpName: demo
+LogType: demolog
+
 LogLevel: DEBUG
 LogOut: console
 LogFile: ./logs/demo.log

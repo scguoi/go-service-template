@@ -4,6 +4,7 @@ import (
 	"context"
 	"runtime/debug"
 	demoProto "template/demo"
+	"template/internal/logc"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -17,7 +18,23 @@ func NewDemoService() *DemoService {
 	return &DemoService{}
 }
 
+type service struct {
+	log *logc.BizLog
+}
+
 func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *demoProto.RespPkg, err error) {
+	return (&service{log: logc.NewBizLog()}).OneWay(ctx, req)
+}
+
+func (s *DemoService) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService_HalfStreamServer) error {
+	return (&service{log: logc.NewBizLog()}).HalfStream(req, stream)
+}
+
+func (s *DemoService) Stream(stream demoProto.DemoService_StreamServer) error {
+	return (&service{log: logc.NewBizLog()}).Stream(stream)
+}
+
+func (s *service) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *demoProto.RespPkg, err error) {
 	CurrentReqCount.Inc()
 	startTime := time.Now()
 	defer func() {
@@ -31,7 +48,7 @@ func (s *DemoService) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *d
 	return
 }
 
-func (s *DemoService) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService_HalfStreamServer) error {
+func (s *service) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService_HalfStreamServer) error {
 	CurrentReqCount.Inc()
 	startTime := time.Now()
 	defer func() {
@@ -54,7 +71,7 @@ func (s *DemoService) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoSer
 	return nil
 }
 
-func (s *DemoService) Stream(stream demoProto.DemoService_StreamServer) error {
+func (s *service) Stream(stream demoProto.DemoService_StreamServer) error {
 	CurrentReqCount.Inc()
 	startTime := time.Now()
 	defer func() {
