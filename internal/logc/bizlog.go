@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"strings"
 	"template/internal/config"
@@ -66,6 +67,19 @@ func (b *BizLog) LoggerEnd() {
 	b.utm = int32(b.etm.Sub(b.stm).Milliseconds())
 	b.structured["etm"] = b.etm.Format("2006-01-02 15:04:05.000")
 	b.structured["utm"] = fmt.Sprintf("%d", b.utm)
+	if _, ok := b.structured["traceid"]; !ok {
+		b.structured["traceid"] = uuid.New().String()
+	}
+	if _, ok := b.structured["appid"]; !ok {
+		b.structured["appid"] = config.ServiceConfig.DefaultAppID
+	}
+	if _, ok := b.structured["productline"]; !ok {
+		b.structured["productline"] = config.ServiceConfig.DefaultProductLine
+	}
+	if _, ok := b.structured["bizid"]; !ok {
+		b.structured["bizid"] = config.ServiceConfig.DefaultBizID
+	}
+
 	// map to fields
 	fields := log.Fields{}
 	for key, value := range b.structured {
@@ -75,11 +89,18 @@ func (b *BizLog) LoggerEnd() {
 	// send to kafka
 	if config.ServiceConfig.IsRemoteBizLog && producer != nil {
 		topic := b.structured["logtype"]
-		value := b.buildStrLog()
+		value := buildStrLog(b.structured)
+
+		header := map[string]string{
+			"collectionName": b.logType,
+		}
+		headerStr := buildStrLog(header)
+
+		logValue := fmt.Sprintf("%010d%010d%s%s", len(headerStr), len(value), headerStr, value)
 
 		err = producer.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-			Value:          []byte(value)},
+			Value:          []byte(logValue)},
 			chain,
 		)
 		if err != nil {
@@ -88,9 +109,9 @@ func (b *BizLog) LoggerEnd() {
 	}
 }
 
-func (b *BizLog) buildStrLog() string {
+func buildStrLog(l map[string]string) string {
 	logStr := ""
-	for k, v := range b.structured {
+	for k, v := range l {
 		logStr += trimStr(k) + "~" + trimStr(v) + string([]byte{31})
 	}
 	return logStr

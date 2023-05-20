@@ -6,7 +6,7 @@ MetricPort: 8060
 AgentOpsPort: 8050
 
 CpName: demo
-LogType: demolog
+LogType: log-query-service
 
 LogLevel: DEBUG
 LogOut: console
@@ -15,6 +15,9 @@ LogMaxDays: 30
 
 IsRemoteBizLog: true
 AsyncChainSize: 20000
+DefaultAppID: CB2W28VA
+DefaultProductLine: com
+DefaultBizID: com
 KafkaClientExt:
   bootstrap.servers: "172.31.114.161:9092"
   acks: "all"

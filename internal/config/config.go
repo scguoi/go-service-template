@@ -27,6 +27,10 @@ type ServiceYaml struct {
 	IsRemoteBizLog bool                   `yaml:"IsRemoteBizLog"`
 	AsyncChainSize int                    `yaml:"AsyncChainSize"`
 	KafkaClientExt map[string]interface{} `yaml:"KafkaClientExt"`
+
+	DefaultAppID       string `yaml:"DefaultAppID"`
+	DefaultProductLine string `yaml:"DefaultProductLine"`
+	DefaultBizID       string `yaml:"DefaultBizID"`
 }
 
 var ServiceConfig *ServiceYaml

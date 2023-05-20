@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/confluentinc/confluent-kafka-go/v2 v2.1.1
 	github.com/google/gops v0.3.26
+	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
