@@ -85,7 +85,9 @@ func (b *BizLog) LoggerEnd() {
 	for key, value := range b.structured {
 		fields[key] = value
 	}
-	log.WithFields(fields).Info()
+	if config.ServiceConfig.IsLocalBizLog {
+		log.WithFields(fields).Info()
+	}
 	// send to kafka
 	if config.ServiceConfig.IsRemoteBizLog && producer != nil {
 		topic := b.structured["logtype"]

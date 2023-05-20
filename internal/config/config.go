@@ -24,7 +24,9 @@ type ServiceYaml struct {
 	CpName  string `yaml:"CpName"`
 	LogType string `yaml:"LogType"`
 
-	IsRemoteBizLog bool                   `yaml:"IsRemoteBizLog"`
+	IsRemoteBizLog bool `yaml:"IsRemoteBizLog"`
+	IsLocalBizLog  bool `yaml:"IsLocalBizLog"`
+
 	AsyncChainSize int                    `yaml:"AsyncChainSize"`
 	KafkaClientExt map[string]interface{} `yaml:"KafkaClientExt"`
 

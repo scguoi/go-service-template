@@ -14,6 +14,7 @@ LogFile: ./logs/demo.log
 LogMaxDays: 30
 
 IsRemoteBizLog: true
+IsLocalBizLog: true
 AsyncChainSize: 20000
 DefaultAppID: CB2W28VA
 DefaultProductLine: com
