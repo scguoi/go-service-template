@@ -12,3 +12,9 @@ LogLevel: DEBUG
 LogOut: console
 LogFile: ./logs/demo.log
 LogMaxDays: 30
+
+IsRemoteBizLog: true
+AsyncChainSize: 20000
+KafkaClientExt:
+  bootstrap.servers: "172.31.114.161:9092"
+  acks: "all"

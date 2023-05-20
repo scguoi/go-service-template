@@ -3,7 +3,9 @@ package logc
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"template/internal/config"
 	"time"
 )
@@ -40,6 +42,10 @@ func (b *BizLog) Printf(format string, args ...interface{}) {
 	b.raw = append(b.raw, fmt.Sprintf(format, args...))
 }
 
+func (b *BizLog) Print(args ...interface{}) {
+	b.raw = append(b.raw, fmt.Sprint(args...))
+}
+
 func (b *BizLog) LoggerStructured(key string, value string) {
 	b.structured[key] = value
 }
@@ -57,13 +63,42 @@ func (b *BizLog) LoggerEnd() {
 	}
 	b.structured["inner"] = string(raw)
 	b.etm = time.Now()
-	b.utm = int32(b.etm.Sub(b.stm).Nanoseconds() / 1e6)
+	b.utm = int32(b.etm.Sub(b.stm).Milliseconds())
 	b.structured["etm"] = b.etm.Format("2006-01-02 15:04:05.000")
-	b.structured["utm"] = string(b.utm)
+	b.structured["utm"] = fmt.Sprintf("%d", b.utm)
 	// map to fields
 	fields := log.Fields{}
 	for key, value := range b.structured {
 		fields[key] = value
 	}
 	log.WithFields(fields).Info()
+	// send to kafka
+	if config.ServiceConfig.IsRemoteBizLog && producer != nil {
+		topic := b.structured["logtype"]
+		value := b.buildStrLog()
+
+		err = producer.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+			Value:          []byte(value)},
+			chain,
+		)
+		if err != nil {
+			log.Errorf("kafka produce failed, err: %v", err)
+		}
+	}
+}
+
+func (b *BizLog) buildStrLog() string {
+	logStr := ""
+	for k, v := range b.structured {
+		logStr += trimStr(k) + "~" + trimStr(v) + string([]byte{31})
+	}
+	return logStr
+}
+
+func trimStr(str string) string {
+	str = strings.ReplaceAll(str, "\n", "")
+	str = strings.ReplaceAll(str, "\r", "")
+	str = strings.ReplaceAll(str, string([]byte{31}), "")
+	return str
 }

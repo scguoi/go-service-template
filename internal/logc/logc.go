@@ -1,6 +1,7 @@
 package logc
 
 import (
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"path"
 	"runtime"
 	"strconv"
@@ -11,6 +12,9 @@ import (
 	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	log "github.com/sirupsen/logrus"
 )
+
+var producer *kafka.Producer // kafka producer
+var chain chan kafka.Event   // 异步发送缓存
 
 func init() {
 	switch strings.ToLower(config.ServiceConfig.LogLevel) {
@@ -48,4 +52,26 @@ func init() {
 		)
 		log.SetOutput(writer)
 	}
+
+	if config.ServiceConfig.IsRemoteBizLog {
+		conf := buildConfigMap(config.ServiceConfig.KafkaClientExt)
+		p, err := kafka.NewProducer(&conf)
+		if err != nil {
+			log.Errorf("kafka new producer failed, err: %v", err)
+		}
+		producer = p
+		chain = make(chan kafka.Event, config.ServiceConfig.AsyncChainSize)
+	}
+}
+
+func buildConfigMap(configMap map[string]interface{}) kafka.ConfigMap {
+	conf := kafka.ConfigMap{}
+	for k, v := range configMap {
+		if c, ok := v.(map[string]interface{}); ok {
+			conf[k] = buildConfigMap(c)
+		} else {
+			conf[k] = v
+		}
+	}
+	return conf
 }

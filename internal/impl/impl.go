@@ -6,8 +6,6 @@ import (
 	demoProto "template/demo"
 	"template/internal/logc"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type DemoService struct {
@@ -41,9 +39,11 @@ func (s *service) OneWay(ctx context.Context, req *demoProto.ReqPkg) (res *demoP
 		CurrentReqCount.Dec()
 		ResponseTime.WithLabelValues("OneWay").Observe(time.Since(startTime).Seconds())
 		if err := recover(); err != nil {
-			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
+			s.log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}
+		s.log.LoggerEnd()
 	}()
+	s.log.Print("oneway rev: ", req.Age, req.Name)
 	res, err = &demoProto.RespPkg{Code: req.Age, Msg: "hello " + req.Name}, nil
 	return
 }
@@ -55,16 +55,18 @@ func (s *service) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService
 		CurrentReqCount.Dec()
 		ResponseTime.WithLabelValues("HalfStream").Observe(time.Since(startTime).Seconds())
 		if err := recover(); err != nil {
-			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
+			s.log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}
+		s.log.LoggerEnd()
 	}()
-	log.Println("half stream rev: ", req.Age, req.Name)
+	s.log.Print("half stream rev: ", req.Age, req.Name)
 	for {
 		if err := stream.Send(&demoProto.RespPkg{Code: 303, Msg: "continue"}); err != nil {
-			log.Println("stream send error:", err)
+			s.log.Printf("stream send error:", err)
 		}
+		time.Sleep(100 * time.Millisecond)
 		if err := stream.Send(&demoProto.RespPkg{Code: 200, Msg: "success"}); err != nil {
-			log.Println("stream send error:", err)
+			s.log.Printf("stream send error:", err)
 		}
 		break
 	}
@@ -78,26 +80,27 @@ func (s *service) Stream(stream demoProto.DemoService_StreamServer) error {
 		CurrentReqCount.Dec()
 		ResponseTime.WithLabelValues("Stream").Observe(time.Since(startTime).Seconds())
 		if err := recover(); err != nil {
-			log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
+			s.log.Printf("Work panic with %s %s\n", err, string(debug.Stack()))
 		}
+		s.log.LoggerEnd()
 	}()
 
 	for {
 		req, err := stream.Recv()
-		log.Println("stream rev: ", req.Age, req.Name)
+		s.log.Print("stream rev: ", req.Age, req.Name)
 		time.Sleep(time.Millisecond * 300)
 		if err != nil {
-			log.Println("stream rev error:", err)
+			s.log.Printf("stream rev error:", err)
 			break
 		}
 		if req.Age == 18 {
 			if err := stream.Send(&demoProto.RespPkg{Code: 200, Msg: "success"}); err != nil {
-				log.Println("stream send error:", err)
+				s.log.Printf("stream send error:", err)
 			}
 			break
 		} else {
 			if err := stream.Send(&demoProto.RespPkg{Code: 303, Msg: "continue"}); err != nil {
-				log.Println("stream send error:", err)
+				s.log.Printf("stream send error:", err)
 			}
 		}
 	}
