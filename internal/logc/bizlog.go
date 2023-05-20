@@ -2,6 +2,7 @@ package logc
 
 import (
 	"encoding/json"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"template/internal/config"
 	"time"
@@ -33,6 +34,10 @@ func NewBizLog() *BizLog {
 
 func (b *BizLog) LoggerRaw(raw string) {
 	b.raw = append(b.raw, raw)
+}
+
+func (b *BizLog) Printf(format string, args ...interface{}) {
+	b.raw = append(b.raw, fmt.Sprintf(format, args...))
 }
 
 func (b *BizLog) LoggerStructured(key string, value string) {
