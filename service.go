@@ -9,6 +9,7 @@ import (
 	"template/internal/config"
 	"template/internal/gracefulstop"
 	"template/internal/impl"
+	"template/internal/logc"
 
 	"github.com/google/gops/agent"
 	"google.golang.org/grpc/reflection"
@@ -16,9 +17,6 @@ import (
 	demoProto "template/demo"
 
 	_ "net/http/pprof"
-	_ "template/internal/config"
-	_ "template/internal/impl"
-	_ "template/internal/logc"
 
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/julienschmidt/httprouter"
@@ -31,6 +29,11 @@ import (
 )
 
 func main() {
+	// load config and initial
+	config.Load()
+	logc.Initial()
+	impl.Initial()
+
 	// grpc server
 	log.Printf("hi service is starting...")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))

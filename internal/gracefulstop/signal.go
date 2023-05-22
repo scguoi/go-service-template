@@ -22,14 +22,13 @@ func WaitExit(c chan os.Signal, exit func(ctx context.Context)) {
 				time.Sleep(time.Second)
 			}
 			exit(context.Background())
-			os.Exit(0)
 		}
 	}
 }
 
 // NewShutdownSignal new normal Signal channel
 func NewShutdownSignal() chan os.Signal {
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	// SIGHUP: terminal closed
 	// SIGINT: Ctrl+C
 	// SIGTERM: program exit

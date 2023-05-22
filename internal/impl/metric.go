@@ -8,6 +8,6 @@ var ResponseTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets: prometheus.ExponentialBucketsRange(1, 60000, 15), // 桶的配置
 }, []string{"method"})
 
-func init() {
+func Initial() {
 	prometheus.MustRegister(ResponseTime)
 }

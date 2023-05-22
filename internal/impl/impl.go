@@ -62,11 +62,11 @@ func (s *service) HalfStream(req *demoProto.ReqPkg, stream demoProto.DemoService
 	s.log.Print("half stream rev: ", req.Age, req.Name)
 	for {
 		if err := stream.Send(&demoProto.RespPkg{Code: 303, Msg: "continue"}); err != nil {
-			s.log.Printf("stream send error:", err)
+			s.log.Printf("stream send error: %s", err)
 		}
 		time.Sleep(100 * time.Millisecond)
 		if err := stream.Send(&demoProto.RespPkg{Code: 200, Msg: "success"}); err != nil {
-			s.log.Printf("stream send error:", err)
+			s.log.Printf("stream send error: %s", err)
 		}
 		break
 	}
@@ -90,17 +90,17 @@ func (s *service) Stream(stream demoProto.DemoService_StreamServer) error {
 		s.log.Print("stream rev: ", req.Age, req.Name)
 		time.Sleep(time.Millisecond * 300)
 		if err != nil {
-			s.log.Printf("stream rev error:", err)
+			s.log.Printf("stream rev error: %s", err)
 			break
 		}
 		if req.Age == 18 {
 			if err := stream.Send(&demoProto.RespPkg{Code: 200, Msg: "success"}); err != nil {
-				s.log.Printf("stream send error:", err)
+				s.log.Printf("stream send error: %s", err)
 			}
 			break
 		} else {
 			if err := stream.Send(&demoProto.RespPkg{Code: 303, Msg: "continue"}); err != nil {
-				s.log.Printf("stream send error:", err)
+				s.log.Printf("stream send error: %s", err)
 			}
 		}
 	}

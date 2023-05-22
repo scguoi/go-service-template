@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const configFile = "conf/services.yaml"
+var _configFile = "conf/services.yaml"
 
 type ServiceYaml struct {
 	GRPCPort     int    `yaml:"GrpcPort"`
@@ -37,11 +37,15 @@ type ServiceYaml struct {
 
 var ServiceConfig *ServiceYaml
 
-func init() {
+func Load() {
+	loadConfig(_configFile)
+}
+
+func loadConfig(file string) {
 	ServiceConfig = new(ServiceYaml)
-	fileBytes, err := os.ReadFile(configFile)
+	fileBytes, err := os.ReadFile(file)
 	if err != nil {
-		log.Fatal("read config file "+configFile+" failed. ", err)
+		log.Fatal("read config file "+file+" failed. ", err)
 	}
 	err = yaml.Unmarshal(fileBytes, ServiceConfig)
 	if err != nil {

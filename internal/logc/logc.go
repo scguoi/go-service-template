@@ -17,7 +17,7 @@ import (
 var producer *kafka.Producer // kafka producer
 var chain chan kafka.Event   // 异步发送缓存
 
-func init() {
+func Initial() {
 	switch strings.ToLower(config.ServiceConfig.LogLevel) {
 	case "debug":
 		log.SetLevel(log.DebugLevel)
