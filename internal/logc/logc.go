@@ -1,13 +1,14 @@
 package logc
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"path"
 	"runtime"
 	"strconv"
 	"strings"
 	"template/internal/config"
 	"time"
+
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 
 	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	log "github.com/sirupsen/logrus"

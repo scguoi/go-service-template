@@ -3,12 +3,13 @@ package logc
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 	"strings"
 	"template/internal/config"
 	"time"
+
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type BizLog struct {

@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/google/gops/agent"
-	"google.golang.org/grpc/reflection"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -12,7 +10,15 @@ import (
 	"template/internal/gracefulstop"
 	"template/internal/impl"
 
+	"github.com/google/gops/agent"
+	"google.golang.org/grpc/reflection"
+
 	demoProto "template/demo"
+
+	_ "net/http/pprof"
+	_ "template/internal/config"
+	_ "template/internal/impl"
+	_ "template/internal/logc"
 
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/julienschmidt/httprouter"
@@ -22,15 +28,11 @@ import (
 	"github.com/tmc/grpc-websocket-proxy/wsproxy"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	_ "net/http/pprof"
-	_ "template/internal/config"
-	_ "template/internal/impl"
-	_ "template/internal/logc"
 )
 
 func main() {
 	// grpc server
-	log.Println("hi service is starting...")
+	log.Printf("hi service is starting...")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -42,7 +44,7 @@ func main() {
 	demoProto.RegisterDemoServiceServer(grpcServer, impl.NewDemoService())
 	grpcPrometheus.Register(grpcServer)
 	reflection.Register(grpcServer)
-	log.Println("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
+	log.Printf("Serving gRPC on", fmt.Sprintf(":%d", config.ServiceConfig.GRPCPort))
 	go func() { log.Fatalln(grpcServer.Serve(lis)) }()
 
 	// grpc gateway
@@ -61,7 +63,7 @@ func main() {
 		Addr:    fmt.Sprintf(":%d", config.ServiceConfig.HTTPPort),
 		Handler: gwMux,
 	}
-	log.Println("Serving gRPC-Gateway on", fmt.Sprintf(":%d", config.ServiceConfig.HTTPPort))
+	log.Printf("Serving gRPC-Gateway on", fmt.Sprintf(":%d", config.ServiceConfig.HTTPPort))
 	go func() { log.Fatalln(gwServer.ListenAndServe()) }()
 
 	// grpc websocket
@@ -69,14 +71,14 @@ func main() {
 		Addr:    fmt.Sprintf(":%d", config.ServiceConfig.WSPort),
 		Handler: wsproxy.WebsocketProxy(gwMux),
 	}
-	log.Println("Serving gRPC-Websocket on", fmt.Sprintf(":%d", config.ServiceConfig.WSPort))
+	log.Printf("Serving gRPC-Websocket on", fmt.Sprintf(":%d", config.ServiceConfig.WSPort))
 	go func() { log.Fatalln(gwWSServer.ListenAndServe()) }()
 
 	// api docs
 	router := httprouter.New()
 	router.GET("/api/docs", demoProto.APIProto)
 	bind := fmt.Sprintf(":%d", config.ServiceConfig.APIPort)
-	log.Println("Serving API Proto starting on", bind)
+	log.Printf("Serving API Proto starting on", bind)
 	apiSrv := &http.Server{
 		Addr:    bind,
 		Handler: router,
@@ -85,7 +87,7 @@ func main() {
 
 	// prometheus
 	go func() {
-		log.Println("Serving Prometheus on", fmt.Sprintf(":%d", config.ServiceConfig.MetricPort))
+		log.Printf("Serving Prometheus on", fmt.Sprintf(":%d", config.ServiceConfig.MetricPort))
 		mux := http.NewServeMux()
 		mux.Handle("/metrics", promhttp.Handler())
 		mux.HandleFunc("/debug/pprof/", pprof.Index)
@@ -110,23 +112,23 @@ func main() {
 	gracefulstop.WaitExit(signalChan, func(ctx context.Context) {
 		err := gwServer.Shutdown(ctx)
 		if err != nil {
-			log.Println("gwServer shutdown failed", err)
+			log.Printf("gwServer shutdown failed", err)
 		} else {
-			log.Println("gwServer shutdown succeed")
+			log.Printf("gwServer shutdown succeed")
 		}
 		err = gwWSServer.Shutdown(ctx)
 		if err != nil {
-			log.Println("gwWSServer shutdown failed", err)
+			log.Printf("gwWSServer shutdown failed", err)
 		} else {
-			log.Println("gwWSServer shutdown succeed")
+			log.Printf("gwWSServer shutdown succeed")
 		}
 		grpcServer.GracefulStop()
-		log.Println("grpc server graceful stop")
+		log.Printf("grpc server graceful stop")
 		err = apiSrv.Shutdown(ctx)
 		if err != nil {
-			log.Println("apiSrv shutdown failed", err)
+			log.Printf("apiSrv shutdown failed", err)
 		} else {
-			log.Println("apiSrv shutdown succeed")
+			log.Printf("apiSrv shutdown succeed")
 		}
 		agent.Close()
 	})
