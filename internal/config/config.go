@@ -41,14 +41,18 @@ func Load() {
 	loadConfig(_configFile)
 }
 
-func loadConfig(file string) {
+func LoadWithYaml(content []byte) {
 	ServiceConfig = new(ServiceYaml)
+	err := yaml.Unmarshal(content, ServiceConfig)
+	if err != nil {
+		log.Fatal("unmarshal service config failed. ", err)
+	}
+}
+
+func loadConfig(file string) {
 	fileBytes, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatal("read config file "+file+" failed. ", err)
 	}
-	err = yaml.Unmarshal(fileBytes, ServiceConfig)
-	if err != nil {
-		log.Fatal("unmarshal service config failed. ", err)
-	}
+	LoadWithYaml(fileBytes)
 }

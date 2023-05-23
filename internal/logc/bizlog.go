@@ -1,7 +1,6 @@
 package logc
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"template/internal/config"
@@ -45,7 +44,9 @@ func (b *BizLog) Printf(format string, args ...interface{}) {
 }
 
 func (b *BizLog) Print(args ...interface{}) {
-	b.raw = append(b.raw, fmt.Sprint(args...))
+	str := fmt.Sprintln(args...)
+	str = strings.TrimSuffix(str, "\n")
+	b.raw = append(b.raw, str)
 }
 
 func (b *BizLog) LoggerStructured(key string, value string) {
@@ -59,11 +60,7 @@ func (b *BizLog) LoggerStructuredBatch(logs map[string]string) {
 }
 
 func (b *BizLog) LoggerEnd() {
-	raw, err := json.Marshal(b.raw)
-	if err != nil {
-		log.Errorf("json marshal failed, err: %v", err)
-	}
-	b.structured["inner"] = string(raw)
+	b.structured["inner"] = "[" + strings.Join(b.raw, " ") + "]"
 	b.etm = time.Now()
 	b.utm = int32(b.etm.Sub(b.stm).Milliseconds())
 	b.structured["etm"] = b.etm.Format("2006-01-02 15:04:05.000")
@@ -81,27 +78,26 @@ func (b *BizLog) LoggerEnd() {
 		b.structured["bizid"] = config.ServiceConfig.DefaultBizID
 	}
 
-	// map to fields
-	fields := log.Fields{}
-	for key, value := range b.structured {
-		fields[key] = value
-	}
 	if config.ServiceConfig.IsLocalBizLog {
+		// map to fields
+		fields := log.Fields{}
+		for key, value := range b.structured {
+			fields[key] = value
+		}
 		log.WithFields(fields).Info()
 	}
+	topic := b.structured["logtype"]
+	value := buildStrLog(b.structured)
+
+	header := map[string]string{
+		"collectionName": b.logType,
+	}
+	headerStr := buildStrLog(header)
+
+	logValue := fmt.Sprintf("%010d%010d%s%s", len(headerStr), len(value), headerStr, value)
 	// send to kafka
 	if config.ServiceConfig.IsRemoteBizLog && producer != nil {
-		topic := b.structured["logtype"]
-		value := buildStrLog(b.structured)
-
-		header := map[string]string{
-			"collectionName": b.logType,
-		}
-		headerStr := buildStrLog(header)
-
-		logValue := fmt.Sprintf("%010d%010d%s%s", len(headerStr), len(value), headerStr, value)
-
-		err = producer.Produce(&kafka.Message{
+		err := producer.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Value:          []byte(logValue)},
 			chain,
