@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// *
+//*
 // 响应包
 type ReqPkg struct {
 	state         protoimpl.MessageState
@@ -78,7 +78,7 @@ func (x *ReqPkg) GetAge() int32 {
 	return 0
 }
 
-// *
+//*
 // 响应包
 type RespPkg struct {
 	state         protoimpl.MessageState
