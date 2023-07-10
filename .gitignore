@@ -4,3 +4,4 @@ logs
 binarys
 .vscode
 __debug_bin
+*.exe
