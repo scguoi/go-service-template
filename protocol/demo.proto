@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package example;
+
+option go_package = "template/protocol";
+
+import "google/api/annotations.proto";
+
+/**
+ * 响应包
+ */
+message ReqPkg {
+  string name = 1; /// 用户名
+  int32 age = 2; /// 名字
+}
+
+/**
+ * 响应包
+ */
+message RespPkg {
+  int32 code = 1; /// 响应码
+  string msg = 2; /// 响应消息
+}
+
+// Demo 服务
+service DemoService {
+  // 单次调用的方法 支持http和grpc调用
+  rpc OneWay (ReqPkg) returns (RespPkg){
+    option (google.api.http) = {
+      post: "/demo"
+      body: "*"
+    };
+  }
+  // 流式调用的方法 支持http chunked和grpc调用
+  rpc Stream (stream ReqPkg) returns (stream RespPkg){
+    option (google.api.http) = {
+      post: "/stream"
+      body: "*"
+    };
+  }
+  // 流式调用的方法 支持http chunked和grpc调用
+  rpc HalfStream (ReqPkg) returns (stream RespPkg){
+    option (google.api.http) = {
+      post: "/halfstream"
+      body: "*"
+    };
+  }
+}

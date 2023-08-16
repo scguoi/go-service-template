@@ -2,19 +2,19 @@
 // source: demo.proto
 
 /*
-Package demo is a reverse proxy.
+Package protocol is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package demo
+package protocol
 
 import (
 	"context"
 	"io"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
+	"github.com/scguoi/grpc-gateway/v2/runtime"
+	"github.com/scguoi/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"

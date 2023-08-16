@@ -5,6 +5,8 @@ APIPort: 8070
 MetricPort: 8060
 AgentOpsPort: 8050
 
+UsingGrpcs: false
+
 CpName: demo
 LogType: log-query-service
 
@@ -13,7 +15,7 @@ LogOut: console
 LogFile: ./logs/demo.log
 LogMaxDays: 30
 
-IsRemoteBizLog: true
+IsRemoteBizLog: false
 IsLocalBizLog: true
 AsyncChainSize: 20000
 DefaultAppID: CB2W28VA

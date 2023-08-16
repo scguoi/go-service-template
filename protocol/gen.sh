@@ -1,0 +1,2 @@
+# 协议生成
+protoc -I=protocol --doc_out=protocol --doc_opt=html,index.html --go_out=protocol --go_opt=paths=source_relative --go-grpc_out=protocol --go-grpc_opt=paths=source_relative --grpc-gateway_out=protocol --grpc-gateway_opt=paths=source_relative ./protocol/demo.proto

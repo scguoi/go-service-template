@@ -21,6 +21,8 @@ type ServiceYaml struct {
 	MetricPort   int    `yaml:"MetricPort"`
 	AgentOpsPort int    `yaml:"AgentOpsPort"`
 
+	UsingGrpcs bool `yaml:"UsingGrpcs"`
+
 	CpName  string `yaml:"CpName"`
 	LogType string `yaml:"LogType"`
 

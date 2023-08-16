@@ -3,9 +3,10 @@ package impl
 import (
 	"context"
 	"runtime/debug"
-	demoProto "template/demo"
-	"template/internal/logc"
 	"time"
+
+	"template/internal/logc"
+	demoProto "template/protocol"
 )
 
 type DemoService struct {
